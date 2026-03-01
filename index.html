@@ -682,7 +682,7 @@
       <div>
         <div class="logo">Dasher <span>3.0</span></div>
         <div class="header-date" id="headerDate"></div>
-        <div class="header-version">v3.1 · atualizado 01/03/2025 19:30</div>
+        <div class="header-version">v3.1 · atualizado 01/03/2026 22:15</div>
       </div>
       <div class="header-actions">
         <button class="btn-icon btn-reset" onclick="showResetModal()">↺ Reset</button>
@@ -1843,11 +1843,14 @@ async function searchFoodAI(query) {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ query })
     });
-    if (!res.ok) throw new Error('API error');
     const data = await res.json();
-    if (!data.cal) throw new Error('Dados inválidos');
+    if (!res.ok) {
+      console.error('Erro API:', data.error);
+      return { _error: data.error || 'Erro desconhecido' };
+    }
+    if (!data.name) return { _error: 'Resposta inválida da IA' };
     return {
-      name: data.name || query,
+      name: data.name,
       cal: parseFloat(data.cal) || 0,
       prot: parseFloat(data.prot) || 0,
       carb: parseFloat(data.carb) || 0,
@@ -1855,7 +1858,8 @@ async function searchFoodAI(query) {
       fiber: parseFloat(data.fiber) || 0
     };
   } catch(e) {
-    return null;
+    console.error('Fetch erro:', e);
+    return { _error: e.message };
   }
 }
 
@@ -1894,8 +1898,8 @@ async function addFoodDirect(mealKey, query) {
   const foodData = await searchFoodAI(query);
   sug.classList.remove('open');
   sug.innerHTML = '';
-  if (!foodData) {
-    showToast(`❌ Não foi possível buscar "${query}". Tente novamente.`, 3500);
+  if (!foodData || foodData._error) {
+    showToast(`❌ Erro: ${foodData?._error || 'tente novamente'}`, 3500);
     return;
   }
   STATE.meals[mealKey].push(foodData);
@@ -1924,8 +1928,8 @@ async function addFood(mealKey) {
   sug.classList.remove('open');
   sug.innerHTML = '';
 
-  if (!foodData) {
-    showToast(`❌ Não consegui encontrar "${query}". Tente ser mais específico.`, 4000);
+  if (!foodData || foodData._error) {
+    showToast(`❌ Erro: ${foodData?._error || 'tente novamente'}`, 4000);
     return;
   }
 
