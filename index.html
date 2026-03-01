@@ -680,9 +680,9 @@
   <div class="header">
     <div class="header-top">
       <div>
-        <div class="logo">Dasher <span>3.0</span></div>
+        <div class="logo">Dasher <span>3.0</span> <span id="logoBadge" style="font-size:11px;font-weight:500;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:0;">0/0</span></div>
         <div class="header-date" id="headerDate"></div>
-        <div class="header-version">v3.1 · atualizado 01/03/2026 22:15</div>
+        <div class="header-version">v3.2 · atualizado 01/03/2026 22:32</div>
       </div>
       <div class="header-actions">
         <button class="btn-icon btn-reset" onclick="showResetModal()">↺ Reset</button>
@@ -1193,6 +1193,7 @@ function switchTab(tab) {
   ['daily','weekly','monthly','annual','specific','core'].forEach(t => {
     document.getElementById('subtab'+t.charAt(0).toUpperCase()+t.slice(1)).style.display = t === tab ? 'block' : 'none';
   });
+  updateProgress();
 }
 
 // ============================
@@ -1465,20 +1466,50 @@ function addSimpleSection(type) {
 // PROGRESS
 // ============================
 function updateProgress() {
+  // Descobrir aba ativa
+  const activeTab = document.querySelector('.tab.active');
+  const tabText = activeTab ? activeTab.textContent : '';
+  
+  const tabMap = {
+    'Diário':      'dailySections',
+    'Semanal':     'weeklySections',
+    'Mensal':      'monthlySections',
+    'Anual':       'annualSections',
+    'Específicos': 'specificSections',
+    'Core':        'coreSections',
+  };
+
+  // Encontrar qual chave corresponde à aba ativa
+  let activeSectionKey = 'dailySections';
+  for (const [label, key] of Object.entries(tabMap)) {
+    if (tabText.includes(label)) { activeSectionKey = key; break; }
+  }
+
+  const activeSections = STATE[activeSectionKey] || [];
   let total = 0, done = 0;
+  activeSections.flatMap(s => s.tasks).forEach(t => {
+    total++;
+    if (STATE.checked[t.id]) done++;
+  });
+
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${done} / ${total} tarefas concluídas (${pct}%)`;
+
+  // Atualizar badge no logo com totais gerais
   const allSections = [
     ...STATE.dailySections,
     ...(STATE.weeklySections||[]), ...(STATE.monthlySections||[]),
     ...(STATE.annualSections||[]), ...(STATE.coreSections||[]),
     ...STATE.specificSections
   ];
+  let totalAll = 0, doneAll = 0;
   allSections.flatMap(s => s.tasks).forEach(t => {
-    total++;
-    if (STATE.checked[t.id]) done++;
+    totalAll++;
+    if (STATE.checked[t.id]) doneAll++;
   });
-  const pct = total > 0 ? Math.round(done/total*100) : 0;
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressText').textContent = `${done} / ${total} tarefas concluídas (${pct}%)`;
+  const logoBadge = document.getElementById('logoBadge');
+  if (logoBadge) logoBadge.textContent = `${doneAll}/${totalAll}`;
 }
 
 // ============================
