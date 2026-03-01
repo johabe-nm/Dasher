@@ -1830,229 +1830,48 @@ function resetDiet() {
 // ============================
 // BASE NUTRICIONAL LOCAL (por 100g ou porção indicada)
 // ============================
-const FOOD_DB = [
-  // OVOS
-  {k:['ovo','ovos','egg'],n:'Ovo cozido (1 unidade ~50g)',cal:77,prot:6,carb:1,fat:5,fiber:0},
-  {k:['ovo frito','ovos fritos'],n:'Ovo frito (1 unidade ~50g)',cal:90,prot:6,carb:0,fat:7,fiber:0},
-  {k:['ovo mexido','ovos mexidos'],n:'Ovo mexido (1 unidade)',cal:91,prot:6,carb:1,fat:7,fiber:0},
-  {k:['clara','claras'],n:'Clara de ovo (1 unidade ~30g)',cal:17,prot:4,carb:0,fat:0,fiber:0},
-  // FRANGO
-  {k:['frango grelhado','peito grelhado','frango'],n:'Frango grelhado (100g)',cal:165,prot:31,carb:0,fat:4,fiber:0},
-  {k:['frango cozido','peito cozido'],n:'Frango cozido (100g)',cal:154,prot:29,carb:0,fat:3,fiber:0},
-  {k:['frango frito'],n:'Frango frito (100g)',cal:246,prot:23,carb:8,fat:14,fiber:0},
-  {k:['coxa','sobrecoxa'],n:'Coxa/sobrecoxa assada (100g)',cal:200,prot:24,carb:0,fat:11,fiber:0},
-  // CARNE
-  {k:['carne moída','carne picada'],n:'Carne moída (100g)',cal:215,prot:22,carb:0,fat:14,fiber:0},
-  {k:['bife','contrafilé','alcatra'],n:'Bife grelhado (100g)',cal:195,prot:26,carb:0,fat:10,fiber:0},
-  {k:['picanha'],n:'Picanha grelhada (100g)',cal:285,prot:25,carb:0,fat:20,fiber:0},
-  {k:['carne suína','lombo','carré','carré suíno'],n:'Carré suíno (100g)',cal:185,prot:23,carb:0,fat:10,fiber:0},
-  {k:['bacon'],n:'Bacon (30g)',cal:129,prot:4,carb:0,fat:12,fiber:0},
-  {k:['linguiça','calabresa'],n:'Linguiça/calabresa (100g)',cal:290,prot:16,carb:2,fat:25,fiber:0},
-  {k:['atum','atum lata'],n:'Atum em água (100g)',cal:116,prot:26,carb:0,fat:1,fiber:0},
-  {k:['sardinha'],n:'Sardinha (100g)',cal:208,prot:25,carb:0,fat:12,fiber:0},
-  {k:['salmão'],n:'Salmão grelhado (100g)',cal:208,prot:20,carb:0,fat:13,fiber:0},
-  {k:['tilápia'],n:'Tilápia grelhada (100g)',cal:128,prot:26,carb:0,fat:3,fiber:0},
-  // ARROZ / MASSAS / CEREAIS
-  {k:['arroz branco','arroz cozido','arroz'],n:'Arroz branco cozido (100g)',cal:130,prot:3,carb:28,fat:0,fiber:1},
-  {k:['arroz integral'],n:'Arroz integral cozido (100g)',cal:112,prot:3,carb:24,fat:1,fiber:2},
-  {k:['feijão','feijão cozido'],n:'Feijão cozido (100g)',cal:77,prot:5,carb:14,fat:0,fiber:5},
-  {k:['feijão preto'],n:'Feijão preto cozido (100g)',cal:91,prot:6,carb:16,fat:0,fiber:6},
-  {k:['lentilha'],n:'Lentilha cozida (100g)',cal:116,prot:9,carb:20,fat:0,fiber:8},
-  {k:['macarrão','massa','espaguete'],n:'Macarrão cozido (100g)',cal:158,prot:6,carb:31,fat:1,fiber:2},
-  {k:['pão','pão de forma'],n:'Pão de forma (1 fatia ~25g)',cal:66,prot:2,carb:13,fat:1,fiber:1},
-  {k:['pão francês','pão de sal'],n:'Pão francês (1 unidade ~50g)',cal:133,prot:4,carb:25,fat:2,fiber:1},
-  {k:['cuscuz','cuscuz nordestino'],n:'Cuscuz de milho cozido (100g)',cal:107,prot:2,carb:23,fat:1,fiber:2},
-  {k:['tapioca'],n:'Tapioca (1 unidade ~70g)',cal:160,prot:0,carb:40,fat:0,fiber:0},
-  {k:['aveia','flocos de aveia'],n:'Aveia em flocos (40g)',cal:152,prot:5,carb:26,fat:3,fiber:4},
-  {k:['granola'],n:'Granola (40g)',cal:176,prot:4,carb:28,fat:6,fiber:3},
-  {k:['batata','batata cozida'],n:'Batata cozida (100g)',cal:87,prot:2,carb:20,fat:0,fiber:2},
-  {k:['batata frita'],n:'Batata frita (100g)',cal:312,prot:3,carb:41,fat:15,fiber:3},
-  {k:['batata doce'],n:'Batata doce cozida (100g)',cal:86,prot:2,carb:20,fat:0,fiber:3},
-  {k:['mandioca','macaxeira','aipim'],n:'Mandioca cozida (100g)',cal:125,prot:1,carb:30,fat:0,fiber:2},
-  // FRUTAS
-  {k:['banana','banana prata','banana nanica'],n:'Banana prata (1 unidade ~90g)',cal:82,prot:1,carb:21,fat:0,fiber:2},
-  {k:['banana da terra'],n:'Banana da terra cozida (100g)',cal:122,prot:1,carb:31,fat:0,fiber:2},
-  {k:['maçã'],n:'Maçã (1 unidade ~130g)',cal:68,prot:0,carb:18,fat:0,fiber:3},
-  {k:['manga'],n:'Manga (100g)',cal:65,prot:1,carb:17,fat:0,fiber:2},
-  {k:['mamão','mamão papaia'],n:'Mamão papaia (100g)',cal:46,prot:1,carb:12,fat:0,fiber:2},
-  {k:['laranja'],n:'Laranja (1 unidade ~130g)',cal:62,prot:1,carb:15,fat:0,fiber:3},
-  {k:['uva'],n:'Uva (100g)',cal:69,prot:1,carb:18,fat:0,fiber:1},
-  {k:['melancia'],n:'Melancia (100g)',cal:30,prot:1,carb:8,fat:0,fiber:0},
-  {k:['abacaxi'],n:'Abacaxi (100g)',cal:50,prot:1,carb:13,fat:0,fiber:1},
-  {k:['morango'],n:'Morango (100g)',cal:32,prot:1,carb:8,fat:0,fiber:2},
-  {k:['abacate'],n:'Abacate (100g)',cal:160,prot:2,carb:9,fat:15,fiber:7},
-  {k:['caju'],n:'Caju (100g)',cal:43,prot:1,carb:10,fat:0,fiber:1},
-  {k:['açaí','açaí puro'],n:'Açaí puro (100g)',cal:70,prot:1,carb:6,fat:5,fiber:2},
-  // LATICÍNIOS
-  {k:['leite integral','leite'],n:'Leite integral (200ml)',cal:122,prot:6,carb:10,fat:7,fiber:0},
-  {k:['leite desnatado'],n:'Leite desnatado (200ml)',cal:70,prot:7,carb:10,fat:0,fiber:0},
-  {k:['iogurte','iogurte natural'],n:'Iogurte natural integral (170g)',cal:100,prot:9,carb:7,fat:4,fiber:0},
-  {k:['iogurte grego'],n:'Iogurte grego (170g)',cal:130,prot:12,carb:9,fat:5,fiber:0},
-  {k:['queijo','queijo mussarela','mussarela'],n:'Queijo mussarela (30g)',cal:90,prot:6,carb:1,fat:7,fiber:0},
-  {k:['queijo cottage','cottage'],n:'Cottage (100g)',cal:98,prot:11,carb:3,fat:4,fiber:0},
-  {k:['ricota'],n:'Ricota (100g)',cal:174,prot:11,carb:3,fat:13,fiber:0},
-  {k:['cream cheese'],n:'Cream cheese (30g)',cal:97,prot:2,carb:1,fat:10,fiber:0},
-  {k:['manteiga'],n:'Manteiga (10g)',cal:72,prot:0,carb:0,fat:8,fiber:0},
-  {k:['requeijão'],n:'Requeijão (30g)',cal:66,prot:2,carb:1,fat:6,fiber:0},
-  // BEBIDAS
-  {k:['suco de laranja','suco laranja'],n:'Suco de laranja natural (200ml)',cal:86,prot:1,carb:21,fat:0,fiber:0},
-  {k:['café','café preto'],n:'Café preto sem açúcar (150ml)',cal:2,prot:0,carb:0,fat:0,fiber:0},
-  {k:['café com leite'],n:'Café com leite (200ml)',cal:70,prot:3,carb:6,fat:4,fiber:0},
-  {k:['whey','whey protein'],n:'Whey protein (30g)',cal:120,prot:24,carb:3,fat:2,fiber:0},
-  {k:['refrigerante','coca','pepsi'],n:'Refrigerante (350ml)',cal:140,prot:0,carb:38,fat:0,fiber:0},
-  {k:['cerveja'],n:'Cerveja (350ml)',cal:154,prot:1,carb:13,fat:0,fiber:0},
-  // LEGUMES E VERDURAS
-  {k:['alface'],n:'Alface (50g)',cal:7,prot:1,carb:1,fat:0,fiber:1},
-  {k:['tomate'],n:'Tomate (1 unidade ~100g)',cal:18,prot:1,carb:4,fat:0,fiber:1},
-  {k:['cenoura'],n:'Cenoura cozida (100g)',cal:41,prot:1,carb:10,fat:0,fiber:3},
-  {k:['brócolis'],n:'Brócolis cozido (100g)',cal:35,prot:2,carb:7,fat:0,fiber:3},
-  {k:['couve'],n:'Couve refogada (50g)',cal:25,prot:2,carb:3,fat:1,fiber:1},
-  {k:['cebola'],n:'Cebola (50g)',cal:20,prot:1,carb:5,fat:0,fiber:1},
-  {k:['alho'],n:'Alho (5g)',cal:7,prot:0,carb:2,fat:0,fiber:0},
-  {k:['espinafre'],n:'Espinafre cozido (100g)',cal:23,prot:3,carb:4,fat:0,fiber:2},
-  {k:['abobrinha'],n:'Abobrinha cozida (100g)',cal:17,prot:1,carb:4,fat:0,fiber:1},
-  {k:['beterraba'],n:'Beterraba cozida (100g)',cal:44,prot:2,carb:10,fat:0,fiber:2},
-  {k:['pepino'],n:'Pepino (100g)',cal:15,prot:1,carb:4,fat:0,fiber:1},
-  // OLEAGINOSAS E EXTRAS
-  {k:['amendoim','pasta de amendoim'],n:'Amendoim (30g)',cal:170,prot:8,carb:5,fat:14,fiber:2},
-  {k:['castanha do pará','castanha do brasil'],n:'Castanha do Pará (3 unidades ~15g)',cal:96,prot:2,carb:2,fat:10,fiber:1},
-  {k:['castanha de caju'],n:'Castanha de caju (30g)',cal:163,prot:4,carb:9,fat:13,fiber:1},
-  {k:['azeite','azeite de oliva'],n:'Azeite de oliva (10ml)',cal:90,prot:0,carb:0,fat:10,fiber:0},
-  {k:['mel'],n:'Mel (15g)',cal:46,prot:0,carb:13,fat:0,fiber:0},
-  {k:['chocolate','chocolate amargo'],n:'Chocolate amargo 70% (25g)',cal:137,prot:2,carb:10,fat:10,fiber:2},
-  {k:['creatina'],n:'Creatina (5g)',cal:0,prot:0,carb:0,fat:0,fiber:0},
-  // REFEIÇÕES PRONTAS
-  {k:['marmita','marmita fitness'],n:'Marmita fitness média (400g)',cal:450,prot:35,carb:45,fat:10,fiber:5},
-  {k:['salada','salada simples'],n:'Salada simples (150g)',cal:30,prot:2,carb:5,fat:0,fiber:3},
-  {k:['sopa','caldo'],n:'Sopa de legumes (300ml)',cal:90,prot:4,carb:15,fat:2,fiber:3},
-  {k:['pizza','fatia de pizza'],n:'Pizza (1 fatia ~100g)',cal:266,prot:11,carb:33,fat:10,fiber:2},
-  {k:['hamburguer','hamburger','burguer'],n:'Hamburguer (1 unidade ~150g)',cal:350,prot:20,carb:30,fat:15,fiber:2},
-  {k:['mingau'],n:'Mingau de aveia com leite (250ml)',cal:185,prot:8,carb:30,fat:4,fiber:3},
-];
-
-function searchFoodDB(query) {
-  const q = query.toLowerCase()
-    .normalize('NFD').replace(/[̀-ͯ]/g,'')
-    .replace(/[^a-z0-9\s]/g,'');
-
-  // Extrai quantidade (ex: "2 ovos", "200g arroz", "3 colheres")
-  const qtMatch = q.match(/^(\d+(?:[.,]\d+)?)\s*(g|kg|ml|l|unidade|und|fatia|copo|colher|xicara|porcao|porcoes)?\s*/);
-  let multiplier = 1;
-  if (qtMatch) {
-    const num = parseFloat(qtMatch[1].replace(',','.'));
-    const unit = qtMatch[2] || '';
-    if (!unit || unit === 'unidade' || unit === 'und') multiplier = num;
-    else if (unit === 'g') multiplier = num / 100;
-    else if (unit === 'kg') multiplier = num * 10;
-    else if (unit === 'ml') multiplier = num / 100;
-    else if (unit === 'l') multiplier = num * 10;
-    else if (unit === 'fatia') multiplier = num;
-    else if (unit === 'copo') multiplier = num * 2;
-    else if (unit === 'colher') multiplier = num * 0.15;
-  }
-  multiplier = Math.max(0.1, Math.min(multiplier, 20));
-
-  // Busca o melhor match nas keywords
-  let best = null, bestScore = 0;
-  for (const food of FOOD_DB) {
-    for (const kw of food.k) {
-      const kwNorm = kw.normalize('NFD').replace(/[̀-ͯ]/g,'');
-      if (q.includes(kwNorm) || kwNorm.includes(q.replace(/^\d+\s*/,''))) {
-        const score = kwNorm.length;
-        if (score > bestScore) { best = food; bestScore = score; }
-      }
-    }
-  }
-
-  if (!best) return null;
-
-  // Constrói nome com quantidade
-  const qText = qtMatch ? qtMatch[0].trim() + ' ' : '';
-  return {
-    name: qText ? `${qText}× ${best.n}` : best.n,
-    cal:   Math.round(best.cal   * multiplier),
-    prot:  Math.round(best.prot  * multiplier),
-    carb:  Math.round(best.carb  * multiplier),
-    fat:   Math.round(best.fat   * multiplier),
-    fiber: Math.round(best.fiber * multiplier),
-  };
-}
-
 // ============================
-// FOOD AUTOCOMPLETE
+// FOOD - IA via GPT (api/nutrition)
 // ============================
-function highlightMatch(text, query) {
-  const q = query.replace(/^\d+\s*(g|kg|ml|l|und|unidade|fatia|copo|colher)?\s*/i,'').trim();
-  if (!q) return text;
-  const idx = text.toLowerCase().indexOf(q.toLowerCase());
-  if (idx === -1) return text;
-  return text.slice(0,idx) + '<mark>' + text.slice(idx, idx+q.length) + '</mark>' + text.slice(idx+q.length);
-}
 
-function getSuggestions(query) {
-  if (!query || query.trim().length < 2) return [];
-  const q = query.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/[^a-z0-9\s]/g,'');
-  // strip leading number/unit to get the food name part
-  const foodQ = q.replace(/^\d+\s*(g|kg|ml|l|und|unidade|fatia|copo|colher)?\s*/,'').trim();
-  if (!foodQ) return [];
-
-  const results = [];
-  for (const food of FOOD_DB) {
-    for (const kw of food.k) {
-      const kwNorm = kw.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-      if (kwNorm.includes(foodQ) || foodQ.includes(kwNorm)) {
-        results.push(food);
-        break;
-      }
-    }
+async function searchFoodAI(query) {
+  try {
+    const res = await fetch('/api/nutrition', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ query })
+    });
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+    if (!data.cal) throw new Error('Dados inválidos');
+    return {
+      name: data.name || query,
+      cal: parseFloat(data.cal) || 0,
+      prot: parseFloat(data.prot) || 0,
+      carb: parseFloat(data.carb) || 0,
+      fat: parseFloat(data.fat) || 0,
+      fiber: parseFloat(data.fiber) || 0
+    };
+  } catch(e) {
+    return null;
   }
-  return results.slice(0, 6);
 }
 
 function showFoodSuggestions(mealKey) {
+  // Com IA não há sugestões em tempo real (custo/latência)
+  // Apenas mostra dica
   const inp = document.getElementById(`foodInp-${mealKey}`);
   const sug = document.getElementById(`foodSug-${mealKey}`);
   const query = inp.value.trim();
-
-  const matches = getSuggestions(query);
   sug.innerHTML = '';
-
-  if (!query || query.length < 2) {
+  if (!query || query.length < 3) {
     sug.classList.remove('open');
     return;
   }
-
-  if (matches.length === 0) {
-    sug.innerHTML = `<div class="suggestion-empty">Nenhum resultado para "${query}"<br><span style="font-size:10px;color:var(--text3)">Tente: frango, arroz, ovo, banana...</span></div>`;
-    sug.classList.add('open');
-    return;
-  }
-
-  matches.forEach(food => {
-    // Calculate with multiplier from query
-    const result = searchFoodDB(query + ' ' + food.k[0]);
-    const preview = result || food;
-    const div = document.createElement('div');
-    div.className = 'suggestion-item';
-    div.innerHTML = `
-      <div class="suggestion-name">${highlightMatch(food.n, query)}</div>
-      <div class="suggestion-cal">${preview.cal} kcal</div>
-      <div class="suggestion-macros">P:${preview.prot}g<br>C:${preview.carb}g G:${preview.fat}g</div>
-    `;
-    div.addEventListener('click', () => {
-      // Build proper query: keep quantity prefix + food keyword
-      const numMatch = query.match(/^(\d+(?:[.,]\d+)?)\s*(g|kg|ml|l|und|unidade|fatia|copo|colher)?\s*/i);
-      inp.value = numMatch ? numMatch[0].trim() + ' ' + food.k[0] : food.k[0];
-      sug.classList.remove('open');
-      sug.innerHTML = '';
-      addFoodDirect(mealKey, inp.value);
-      inp.value = '';
-    });
-    sug.appendChild(div);
-  });
-
+  // Dica de uso
+  sug.innerHTML = `<div class="loading-food" style="color:var(--text2);font-size:12px;padding:10px 14px;">
+    💡 Pressione <b>Enter</b> para buscar "<b>${query}</b>" via IA
+  </div>`;
   sug.classList.add('open');
 }
 
@@ -2066,48 +1885,53 @@ function handleFoodKey(e, mealKey) {
   }
 }
 
-function addFoodDirect(mealKey, query) {
-  const foodData = searchFoodDB(query);
+async function addFoodDirect(mealKey, query) {
+  const sug = document.getElementById(`foodSug-${mealKey}`);
+  sug.innerHTML = `<div class="loading-food">🤖 Buscando via IA...</div>`;
+  sug.classList.add('open');
+  const foodData = await searchFoodAI(query);
+  sug.classList.remove('open');
+  sug.innerHTML = '';
   if (!foodData) {
-    showToast(`🤔 "${query}" não encontrado na base.`, 3000);
+    showToast(`❌ Não foi possível buscar "${query}". Tente novamente.`, 3500);
     return;
   }
   STATE.meals[mealKey].push(foodData);
   saveState();
   renderDiet();
-  showToast(`✅ ${foodData.name} — ${foodData.cal} kcal | P:${foodData.prot}g C:${foodData.carb}g G:${foodData.fat}g`);
+  showToast(`✅ ${foodData.name} — ${Math.round(foodData.cal)} kcal | P:${Math.round(foodData.prot)}g C:${Math.round(foodData.carb)}g G:${Math.round(foodData.fat)}g`);
 }
 
-// Close suggestions when clicking outside
 document.addEventListener('click', (e) => {
   if (!e.target.closest('.add-food')) {
     document.querySelectorAll('.food-suggestions').forEach(s => s.classList.remove('open'));
   }
 });
 
-function addFood(mealKey) {
+async function addFood(mealKey) {
   const inp = document.getElementById(`foodInp-${mealKey}`);
   const query = inp.value.trim();
   if (!query) return;
   inp.value = '';
 
-  const mealBody = document.getElementById(`mealBody-${mealKey}`);
+  const sug = document.getElementById(`foodSug-${mealKey}`);
+  sug.innerHTML = `<div class="loading-food">🤖 Consultando IA para "${query}"...</div>`;
+  sug.classList.add('open');
 
-  const foodData = searchFoodDB(query);
+  const foodData = await searchFoodAI(query);
+  sug.classList.remove('open');
+  sug.innerHTML = '';
 
   if (!foodData) {
-    showToast(`🤔 "${query}" não encontrado. Tente: "2 ovos", "100g frango", "1 banana"`, 4000);
+    showToast(`❌ Não consegui encontrar "${query}". Tente ser mais específico.`, 4000);
     return;
   }
 
   STATE.meals[mealKey].push(foodData);
   saveState();
   renderDiet();
-  showToast(`✅ ${foodData.name} — ${foodData.cal} kcal | P:${foodData.prot}g C:${foodData.carb}g G:${foodData.fat}g`);
+  showToast(`✅ ${foodData.name} — ${Math.round(foodData.cal)} kcal | P:${Math.round(foodData.prot)}g C:${Math.round(foodData.carb)}g G:${Math.round(foodData.fat)}g`);
 }
-
-
-
 
 // ============================
 // INIT
